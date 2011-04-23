@@ -1,0 +1,68 @@
+This project is an effort to parse the contents of Australian government
+websites into a database suitable for mail merging, filtering, etc.
+
+For now, while this project is in its early stages this README file will
+contain a basic overview of the proposed design of this system.
+
+If you're committing to this repository please follow these guidelines:
+ - Don't commit uncommented code. I don't want to have to have to divine the
+   meaning of your code.
+ - If you are making a major architectural change, please speak to me about it
+   before committing.
+ - If you can see problems in the design that will cause issues down the road,
+   please flag them with me as soon as possible.
+Along with these, follow general DVCS-project politeness (informative commit
+messages, <80 characters in first line of commit message, don't create remote
+heads, don't commit code that doesn't compile, etc.).
+
+Design
+------
+Apologies for the confusing manner in which this is described. It's not very
+clear in my head right now.
+                                                  +-----------+
+                                              +++-|Base Parser|
+                           +----+             ||| +-----------+
+    +-------------+<-------|Main|------+     +---------+
+    |Base Provider|        +----+      +---->|Base List|--...
+    +-------------+             |      |     +---------+
+        /       \               |      |      ||
+       /         \              |      |     +----------+
+      /           \             |      +---->|Base Entry|--...
+  +----------+   +----------+   |      |     +----------+
+  |Provider 1|   |Provider 2|   |      |      |
+  +----------+   +----------+   |      |     +------------+
+                                |      +---->|Base Entries|--...
+                               \ /           +------------+
+                           +-----------+
+                           |Base Output|
+                           +-----------+
+                             /      \
+                            /        \
+                           /          \
+                      +----------+   +-------------+
+                      |CSV Output|   |SQLite Output|
+                      +----------+   +-------------+
+
+The main logic of this tool has a provider (an object with the ability to
+retrieve documents over HTTP). The reason for having more than one type of
+provider is to allow different providers to implement different caching
+policies; in particular to allow a provider with a very lazy cache coherence
+protocol for use in testing so as not to overload websites with unnecessary
+HTTP requests.
+
+Main has a set of parsers, each specific to a given webpage. Each parser
+encapsulates the format of a page by providing functions to retrieve the
+contents in a standard format. These contact details webpages are typically
+either a list of links to contact entry pages (in which case they are
+implemented with a class that inherits from Base List), a specific individual's
+contact information (in which case they inherit from Base Entry), or a list of
+several contacts' information (in which case they inherit from Base Entries).
+Lists define a function that returns a set of Base Entrys (sic) that can then
+be used to retrieve individuals' details. In this way, Main should just be able
+to iterate through its known parsers and recursively poll each one.
+
+Main has a single Base Output that it uses when it comes time to write out the
+contact information it has discovered. Each Output defines a format for the
+file(s) it writes.
+
+That should all be as clear as mud now.
