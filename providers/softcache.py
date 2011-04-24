@@ -2,6 +2,7 @@
 
 import providers.base
 import sys
+import os
 
 try:
     import httplib2
@@ -22,3 +23,7 @@ class Provider(providers.base.Provider):
     def get(self, url):
         _, content = self.conn.request(url, 'GET')
         return content
+
+    def clearCache(self):
+        for page in os.listdir(CACHE_DIR):
+            os.remove(os.path.join(CACHE_DIR, page))

@@ -39,3 +39,7 @@ class Provider(providers.base.Provider):
             f.write(content)
             f.close()
         return content
+
+    def clearCache(self):
+        for page in os.listdir(CACHE_DIR):
+            os.remove(os.path.join(CACHE_DIR, page))
