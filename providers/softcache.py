@@ -3,6 +3,7 @@
 import providers.base
 import sys
 import os
+import time
 
 try:
     import httplib2
@@ -19,9 +20,12 @@ class Provider(providers.base.Provider):
     """
     def __init__(self):
         self.conn = httplib2.Http(CACHE_DIR)
+        self.last_request = 0
 
     def get(self, url):
+        super(Provider, self).bePolite()
         _, content = self.conn.request(url, 'GET')
+        self.last_request = time.time()
         return content
 
     def clearCache(self):

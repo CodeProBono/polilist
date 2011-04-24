@@ -4,6 +4,7 @@ import providers.base
 import sys
 import hashlib
 import os
+import time
 
 try:
     import httplib2
@@ -22,6 +23,7 @@ class Provider(providers.base.Provider):
     """
 
     def __init__(self):
+        self.last_request = 0
         self.conn = httplib2.Http()
         if not os.path.exists(CACHE_DIR):
             os.mkdir(CACHE_DIR)
@@ -34,10 +36,12 @@ class Provider(providers.base.Provider):
             content = f.read()
             f.close()
         else:
+            super(Provider, self).bePolite()
             _, content = self.conn.request(url, 'GET')
             f = open(cached_copy, 'w')
             f.write(content)
             f.close()
+            self.last_request = time.time()
         return content
 
     def clearCache(self):

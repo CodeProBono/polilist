@@ -2,7 +2,11 @@
 
 import providers
 
-class Provider:
+import time
+
+POLITE_WAIT = 1 # Seconds
+
+class Provider(object):
     """
     A base template for providers to implement. You may consider all the
     functions in this class abstract (i.e. must be overridden in children). Any
@@ -15,13 +19,25 @@ class Provider:
         """
         Implement any required setup for the provider.
         """
-        pass
+        self.last_request = 0
 
-    def get(url):
+    def get(self, url):
         """
         Retrieve the page at the given URL.
         """
         pass
+
+    def bePolite(self):
+        """
+        A utility function for waiting in between requests. This allows you to
+        be kind to website admins by not hitting their servers so hard. Note
+        that classes planning to use this function need to initialise the
+        member last_request.
+        """
+        elapsed = time.time() - self.last_request
+        if elapsed < POLITE_WAIT:
+            time.sleep(POLITE_WAIT - elapsed)
+        self.last_request = time.time()
 
 def getProvider(module_name):
     """
