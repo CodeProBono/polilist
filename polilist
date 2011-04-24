@@ -6,6 +6,9 @@ import getopt
 import providers.base
 DEFAULT_PROVIDER = 'softcache'
 
+import parsers.base
+active_parsers = {'federal_house_of_representatives':'http://www.aph.gov.au/house/members/mi-alpha.asp'}
+
 USAGE_MESSAGE = """Usage: %s [options]
   [ -d | --debug ]                      Turn on debugging output.
   [ -p provider | --provider=provider ] Use the specific HTTP provider (default = passthrough).
@@ -56,6 +59,17 @@ def main():
             debugPrint(str(inst))
         sys.stderr.write('Could not create the requested provider.\n')
         return 1
+
+    # Enumerate the parsers and retrieve contacts' details.
+    for p in active_parsers.keys():
+        try:
+            parser = parsers.base.getParser(p, provider)
+            parser.get(active_parsers[p])
+        except Exception as inst:
+            if opts['debug']:
+                debugPrint(str(inst))
+            sys.stderr.write('Could not create %s parser.\n' % p)
+            return 1
 
 if __name__ == '__main__':
     main()
