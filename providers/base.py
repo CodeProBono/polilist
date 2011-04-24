@@ -10,7 +10,17 @@ class Provider:
     in the same directory as this file for it to be visible to the getProvider
     function.
     """
+
     def __init__(self):
+        """
+        Implement any required setup for the provider.
+        """
+        pass
+
+    def get(url):
+        """
+        Retrieve the page at the given URL.
+        """
         pass
 
 def getProvider(module_name):

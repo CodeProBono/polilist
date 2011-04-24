@@ -4,7 +4,7 @@ import sys
 import getopt
 
 import providers.base
-DEFAULT_PROVIDER = 'passthrough'
+DEFAULT_PROVIDER = 'softcache'
 
 USAGE_MESSAGE = """Usage: %s [options]
   [ -d | --debug ]                      Turn on debugging output.
