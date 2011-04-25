@@ -7,8 +7,9 @@ class Parser(object):
     A generic template for a parser.
     """
 
-    def __init__(self, provider):
+    def __init__(self, provider, notifier):
         self.provider = provider
+        self.notifier = notifier
 
     def get(url):
         """
@@ -16,12 +17,12 @@ class Parser(object):
         """
         return []
 
-def getParser(module_name, provider):
+def getParser(module_name, provider, notifier):
     """
     Returns a new instance of the given parser.
     """
     mod = __import__('parsers.%s' % module_name, fromlist=['Parser'])
-    p = mod.Parser(provider)
+    p = mod.Parser(provider, notifier)
     if not isinstance(p, parsers.base.Parser):
         raise Exception('Parser defined by module %s is not a valid parser' % \
             module_name)

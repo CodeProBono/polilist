@@ -4,6 +4,8 @@ import providers.base
 import sys
 import time
 
+from util.notifier import *
+
 try:
     import httplib2
 except ImportError:
@@ -19,12 +21,14 @@ class Provider(providers.base.Provider):
     That is not very polite.
     """
 
-    def __init__(self):
+    def __init__(self, notifier):
         self.conn = httplib2.Http()
         self.last_request = 0
+        self.notifier = notifier
 
     def get(self, url):
         super(Provider, self).bePolite()
+        self.notifier.write('Retrieving %s...' % url, DETAILED)
         _, content = self.conn.request(url, 'GET', \
             headers={'cache-control':'no-cache'})
         self.last_request = time.time()

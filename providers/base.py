@@ -15,11 +15,12 @@ class Provider(object):
     function.
     """
 
-    def __init__(self):
+    def __init__(self, notifier):
         """
         Implement any required setup for the provider.
         """
         self.last_request = 0
+        self.notifier = notifier
 
     def get(self, url):
         """
@@ -39,7 +40,7 @@ class Provider(object):
             time.sleep(POLITE_WAIT - elapsed)
         self.last_request = time.time()
 
-def getProvider(module_name):
+def getProvider(module_name, notifier):
     """
     Returns a new instance of the given provider. This function is designed to
     encapsulate constructing the provider, such that neither this file nor the
@@ -47,7 +48,7 @@ def getProvider(module_name):
     before run-time.
     """
     mod = __import__('providers.%s' % module_name, fromlist=['Provider'])
-    p = mod.Provider()
+    p = mod.Provider(notifier)
     if not isinstance(p, providers.base.Provider):
         raise Exception('Provider defined by module %s is not a valid provider' % \
               module_name)

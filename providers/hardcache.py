@@ -6,6 +6,8 @@ import hashlib
 import os
 import time
 
+from util.notifier import *
+
 try:
     import httplib2
 except ImportError:
@@ -22,21 +24,25 @@ class Provider(providers.base.Provider):
     avoid repeated HTTP requests.
     """
 
-    def __init__(self):
+    def __init__(self, notifier):
         self.last_request = 0
         self.conn = httplib2.Http()
         if not os.path.exists(CACHE_DIR):
             os.mkdir(CACHE_DIR)
+        self.notifier = notifier
 
     def get(self, url):
         cached_copy = os.path.join(CACHE_DIR, hashlib.sha1(url).hexdigest())
         content = None
         if os.path.exists(cached_copy):
+            self.notifier.write('Retrieving %s (cached at %s)...' \
+                % (url, cached_copy), DETAILED)
             f = open(cached_copy, 'r')
             content = f.read()
             f.close()
         else:
             super(Provider, self).bePolite()
+            self.notifier.write('Retrieving %s (uncached)...' % url, DETAILED)
             _, content = self.conn.request(url, 'GET')
             f = open(cached_copy, 'w')
             f.write(content)
@@ -45,5 +51,6 @@ class Provider(providers.base.Provider):
         return content
 
     def clearCache(self):
+        self.notifier.write('Clearing cache...', DEBUG)
         for page in os.listdir(CACHE_DIR):
             os.remove(os.path.join(CACHE_DIR, page))

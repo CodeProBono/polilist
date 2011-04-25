@@ -9,6 +9,8 @@ DEFAULT_PROVIDER = 'softcache'
 import parsers.base
 active_parsers = {'federal_house_of_representatives':'http://www.aph.gov.au/house/members/mi-alpha.asp'}
 
+from util.notifier import *
+
 USAGE_MESSAGE = """Usage: %s [options]
   [ -d | --debug ]                      Turn on debugging output.
   [ -p provider | --provider=provider ] Use the specific HTTP provider (default = passthrough).
@@ -25,24 +27,33 @@ def parseArguments(options):
     Parse command line arguments and write the result to the dictionary passed
     in.
     """
-    optlist, args = getopt.getopt(sys.argv[1:], 'dp:', ['debug', 'provider='])
+    optlist, args = getopt.getopt(sys.argv[1:], 'dl:p:v:', ['debug', \
+        'logfile=', 'provider=', 'verbosity='])
 
     if args:
         return False
 
     for opt in optlist:
         if opt[0] in ['-d', '--debug']:
-            options['debug'] = True
+            options['verbosity'] = DEBUG
+        elif opt[0] in ['-l', '--logfile']:
+            options['log'] = opt[1]
         elif opt[0] in ['-p', '--provider']:
             options['provider'] = opt[1]
+        elif opt[0] in ['-v', '--verbosity']:
+            try:
+                options['verbosity'] = int(opt[1])
+            except ValueError:
+                return False
 
     return True
 
 def main():
     # Setup default options.
     opts = { \
-        'debug'   :False, \
-        'provider':DEFAULT_PROVIDER \
+        'log'         :None, \
+        'provider'    :DEFAULT_PROVIDER, \
+        'verbosity'   :INFORMATION \
     }
 
     # Parse command line arguments.
@@ -50,26 +61,43 @@ def main():
         sys.stderr.write(USAGE_MESSAGE)
         return 1
 
+    # Construct the notifier.
+    notifier = None
+    if opts['log']:
+        try:
+            f = open(opts['log'], 'w')
+            notifier = Notifier(f, f, opts['verbosity'])
+        except:
+            sys.stderr.write('Failed to open log file %s.\n' % opts['log'])
+            sys.exit(1)
+    else:
+        notifier = Notifier(sys.stdout, sys.stderr, opts['verbosity'])
+
     # Construct the HTTP provider.
     provider = None
     try:
-        provider = providers.base.getProvider(opts['provider'])
+        provider = providers.base.getProvider(opts['provider'], notifier)
     except Exception as inst:
-        if opts['debug']:
-            debugPrint(str(inst))
-        sys.stderr.write('Could not create the requested provider.\n')
+        notifier.writeError(str(inst), DEBUG)
+        notifier.writeError('Could not create %s provider.' \
+            % opts['provider'], INFORMATION)
         return 1
 
     # Enumerate the parsers and retrieve contacts' details.
     for p in active_parsers.keys():
         try:
-            parser = parsers.base.getParser(p, provider)
+            parser = parsers.base.getParser(p, provider, notifier)
             parser.get(active_parsers[p])
         except Exception as inst:
-            if opts['debug']:
-                debugPrint(str(inst))
-            sys.stderr.write('Could not create %s parser.\n' % p)
+            notifier.writeError(str(inst), DEBUG)
+            notifier.writeError('Could not create %s parser.' % p, INFORMATION)
             return 1
+
+    if opts['log']:
+        try:
+            notifier.stdout.close()
+        except:
+            pass
 
 if __name__ == '__main__':
     main()
