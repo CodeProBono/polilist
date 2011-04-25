@@ -14,12 +14,15 @@ DEFAULT_EXPORTER = 'csv'
 
 from util.notifier import *
 
-USAGE_MESSAGE = """Usage: %s [options]
+USAGE_MESSAGE = """Usage: %s [options] -o output
+       %s [options] --output=output
   [ -d | --debug ]                      Turn on debugging output (equivalent to verbosity level 3).
+  [ -e exporter | --exporter=exporter ] Use the specified exporter format (default CSV).
   [ -? | --help ]                       Display this information and exit.
+  [ -o output | --output=output ]       Write results to output descriptor output. Note that whether output is a file, directory or other descriptor depends on which exporter you are using.
   [ -p provider | --provider=provider ] Use the specific HTTP provider (default = passthrough).
   [ -v level | --verbosity=level ]      Set the level of verbosity of notifications. 0 = nothing, 1 = default, 2 = detailed, 3 = debug.
-""" % sys.argv[0]
+""" % (sys.argv[0], sys.argv[0])
 
 def debugPrint(message):
     """
@@ -32,8 +35,8 @@ def parseArguments(options):
     Parse command line arguments and write the result to the dictionary passed
     in.
     """
-    optlist, args = getopt.getopt(sys.argv[1:], 'd?l:p:v:', ['debug', \
-        'logfile=', 'help', 'provider=', 'verbosity='])
+    optlist, args = getopt.getopt(sys.argv[1:], 'de:?l:o:p:v:', ['debug', \
+        'exporter=', 'help', 'logfile=', 'output=', 'provider=', 'verbosity='])
 
     if args:
         return False
@@ -41,11 +44,15 @@ def parseArguments(options):
     for opt in optlist:
         if opt[0] in ['-d', '--debug']:
             options['verbosity'] = DEBUG
+        elif opt[0] in ['-e', '--exporter']:
+            options['exporter'] = opt[1]
         elif opt[0] in ['-?', '--help']:
             sys.stdout.write(USAGE_MESSAGE)
             sys.exit(0)
         elif opt[0] in ['-l', '--logfile']:
             options['log'] = opt[1]
+        elif opt[0] in ['-o', '--output']:
+            options['output'] = opt[1]
         elif opt[0] in ['-p', '--provider']:
             options['provider'] = opt[1]
         elif opt[0] in ['-v', '--verbosity']:
@@ -59,13 +66,15 @@ def parseArguments(options):
 def main():
     # Setup default options.
     opts = { \
+        'exporter'    :DEFAULT_EXPORTER, \
         'log'         :None, \
+        'output'      :None, \
         'provider'    :DEFAULT_PROVIDER, \
         'verbosity'   :INFORMATION \
     }
 
     # Parse command line arguments.
-    if not parseArguments(opts):
+    if not parseArguments(opts) or not opts['output']:
         sys.stderr.write(USAGE_MESSAGE)
         return 1
 
@@ -94,15 +103,41 @@ def main():
     # Enumerate the parsers and retrieve contacts' details.
     contacts = []
     for p in active_parsers.keys():
+        parser = None
         try:
             parser = parsers.base.getParser(active_parsers[p], provider, \
                 notifier)
-            contacts.extend(parser.get(p))
         except Exception as inst:
             notifier.writeError(str(inst), DEBUG)
             notifier.writeError('Could not create %s parser.' \
                 % active_parsers[p], INFORMATION)
-            return 1
+            continue
+
+        try:
+            contacts.extend(parser.get(p))
+        except Exception as inst:
+            notifier.writeError(str(inst), DEBUG)
+            notifier.writeError('Could not parse %s using parser %s.' \
+                % (p, active_parsers[p]), INFORMATION)
+
+    # Export the contacts.
+    exporter = None
+    try:
+        exporter = exporters.base.getExporter(opts['exporter'], \
+            opts['output'], notifier)
+    except Exception as inst:
+        notifier.writeError(str(inst), DEBUG)
+        notifier.writeError('Could not create %s exporter.' \
+            % opts['exporter'], INFORMATION)
+        return 1
+
+    try:
+        exporter.write(contacts)
+    except Exception as inst:
+        notifier.writeError(str(inst), DEBUG)
+        notifier.writeError('Could not export to %s with exporter %s.' \
+            % (opts['output'], opts['exporter']), INFORMATION)
+        return 1
 
     if opts['log']:
         try:
