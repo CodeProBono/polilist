@@ -92,13 +92,16 @@ def main():
         return 1
 
     # Enumerate the parsers and retrieve contacts' details.
+    contacts = []
     for p in active_parsers.keys():
         try:
-            parser = parsers.base.getParser(p, provider, notifier)
-            parser.get(active_parsers[p])
+            parser = parsers.base.getParser(active_parsers[p], provider, \
+                notifier)
+            contacts.extend(parser.get(p))
         except Exception as inst:
             notifier.writeError(str(inst), DEBUG)
-            notifier.writeError('Could not create %s parser.' % p, INFORMATION)
+            notifier.writeError('Could not create %s parser.' \
+                % active_parsers[p], INFORMATION)
             return 1
 
     if opts['log']:
