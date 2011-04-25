@@ -7,7 +7,7 @@ import providers.base
 DEFAULT_PROVIDER = 'softcache'
 
 import parsers.base
-active_parsers = {'federal_house_of_representatives':'http://www.aph.gov.au/house/members/mi-alpha.asp'}
+active_parsers = {'http://www.aph.gov.au/house/members/mi-alpha.asp':'federal_house_of_representatives'}
 
 import exporters.base
 DEFAULT_EXPORTER = 'csv'
