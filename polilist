@@ -83,7 +83,7 @@ def main():
     if not parseArguments(opts) or (not opts['output'] and \
         not opts['clear-cache']):
         sys.stderr.write(USAGE_MESSAGE)
-        return 1
+        sys.exit(1)
 
     # Construct the notifier.
     notifier = None
@@ -105,7 +105,7 @@ def main():
         notifier.writeError(str(inst), DEBUG)
         notifier.writeError('Could not create %s provider.' \
             % opts['provider'], INFORMATION)
-        return 1
+        sys.exit(1)
 
     # Are we clearing the cache?
     if opts['clear-cache']:
@@ -113,15 +113,15 @@ def main():
             try:
                 provider.clearCache()
                 notifier.write('Cache cleared.', DETAILED)
-                return 0
+                sys.exit(0)
             except Exception as inst:
                 notifier.writeError(str(inst), DEBUG)
                 notifier.writeError('Failed to clear cache.', INFORMATION)
-                return 1
+                sys.exit(1)
         else:
             notifier.writeError('The selected provider has no cache or no ' + \
                 'ability to clear it.', INFORMATION)
-            return 1
+            sys.exit(1)
 
     # Enumerate the parsers and retrieve contacts' details.
     contacts = []
@@ -152,7 +152,7 @@ def main():
         notifier.writeError(str(inst), DEBUG)
         notifier.writeError('Could not create %s exporter.' \
             % opts['exporter'], INFORMATION)
-        return 1
+        sys.exit(1)
 
     try:
         exporter.write(contacts)
@@ -160,7 +160,7 @@ def main():
         notifier.writeError(str(inst), DEBUG)
         notifier.writeError('Could not export to %s with exporter %s.' \
             % (opts['output'], opts['exporter']), INFORMATION)
-        return 1
+        sys.exit(1)
 
     if opts['log']:
         try:
