@@ -34,5 +34,7 @@ class Provider(providers.base.Provider):
 
     def clearCache(self):
         self.notifier.write('Clearing cache...', DEBUG)
-        for page in os.listdir(CACHE_DIR):
-            os.remove(os.path.join(CACHE_DIR, page))
+        for page in map(lambda x:os.path.join(CACHE_DIR, x), \
+            os.listdir(CACHE_DIR)):
+            self.notifier.write('Deleting %s...' % page)
+            os.remove(page)

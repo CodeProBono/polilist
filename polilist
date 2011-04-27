@@ -14,15 +14,17 @@ DEFAULT_EXPORTER = 'csv'
 
 from util.notifier import *
 
-USAGE_MESSAGE = """Usage: %s [options] -o output
-       %s [options] --output=output
+USAGE_MESSAGE = """Usage: %(progname)s [options] -o output
+       %(progname)s [options] --output=output
+       %(progname)s [options] --clear-cache
+  [ --clear-cache ]                     Clear the selected provider's cache. You should explicitly specify a provider when using this option or you may find that you don't delete the cache you're intending to. You should never need to use this option unless you are developing/debugging.
   [ -d | --debug ]                      Turn on debugging output (equivalent to verbosity level 3).
   [ -e exporter | --exporter=exporter ] Use the specified exporter format (default CSV).
   [ -? | --help ]                       Display this information and exit.
   [ -o output | --output=output ]       Write results to output descriptor output. Note that whether output is a file, directory or other descriptor depends on which exporter you are using.
   [ -p provider | --provider=provider ] Use the specific HTTP provider (default = passthrough).
   [ -v level | --verbosity=level ]      Set the level of verbosity of notifications. 0 = nothing, 1 = default, 2 = detailed, 3 = debug.
-""" % (sys.argv[0], sys.argv[0])
+""" % {'progname':sys.argv[0]}
 
 def debugPrint(message):
     """
@@ -35,14 +37,17 @@ def parseArguments(options):
     Parse command line arguments and write the result to the dictionary passed
     in.
     """
-    optlist, args = getopt.getopt(sys.argv[1:], 'de:?l:o:p:v:', ['debug', \
-        'exporter=', 'help', 'logfile=', 'output=', 'provider=', 'verbosity='])
+    optlist, args = getopt.getopt(sys.argv[1:], 'de:?l:o:p:v:', \
+        ['clear-cache', 'debug', 'exporter=', 'help', 'logfile=', 'output=', \
+        'provider=', 'verbosity='])
 
     if args:
         return False
 
     for opt in optlist:
-        if opt[0] in ['-d', '--debug']:
+        if opt[0] == '--clear-cache':
+            options['clear-cache'] = True
+        elif opt[0] in ['-d', '--debug']:
             options['verbosity'] = DEBUG
         elif opt[0] in ['-e', '--exporter']:
             options['exporter'] = opt[1]
@@ -66,6 +71,7 @@ def parseArguments(options):
 def main():
     # Setup default options.
     opts = { \
+        'clear-cache' :False, \
         'exporter'    :DEFAULT_EXPORTER, \
         'log'         :None, \
         'output'      :None, \
@@ -74,7 +80,8 @@ def main():
     }
 
     # Parse command line arguments.
-    if not parseArguments(opts) or not opts['output']:
+    if not parseArguments(opts) or (not opts['output'] and \
+        not opts['clear-cache']):
         sys.stderr.write(USAGE_MESSAGE)
         return 1
 
@@ -99,6 +106,22 @@ def main():
         notifier.writeError('Could not create %s provider.' \
             % opts['provider'], INFORMATION)
         return 1
+
+    # Are we clearing the cache?
+    if opts['clear-cache']:
+        if hasattr(provider, 'clearCache'):
+            try:
+                provider.clearCache()
+                notifier.write('Cache cleared.', DETAILED)
+                return 0
+            except Exception as inst:
+                notifier.writeError(str(inst), DEBUG)
+                notifier.writeError('Failed to clear cache.', INFORMATION)
+                return 1
+        else:
+            notifier.writeError('The selected provider has no cache or no ' + \
+                'ability to clear it.', INFORMATION)
+            return 1
 
     # Enumerate the parsers and retrieve contacts' details.
     contacts = []
