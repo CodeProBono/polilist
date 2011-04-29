@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-import providers
-
 import time
 
 POLITE_WAIT = 1 # Seconds
@@ -39,17 +37,3 @@ class Provider(object):
         if elapsed < POLITE_WAIT:
             time.sleep(POLITE_WAIT - elapsed)
         self.last_request = time.time()
-
-def getProvider(module_name, notifier):
-    """
-    Returns a new instance of the given provider. This function is designed to
-    encapsulate constructing the provider, such that neither this file nor the
-    file containing main() needs to be aware of the provider name/location
-    before run-time.
-    """
-    mod = __import__('providers.%s' % module_name, fromlist=['Provider'])
-    p = mod.Provider(notifier)
-    if not isinstance(p, providers.base.Provider):
-        raise Exception('Provider defined by module %s is not a valid provider' % \
-              module_name)
-    return p

@@ -100,7 +100,7 @@ def main():
     # Construct the HTTP provider.
     provider = None
     try:
-        provider = providers.base.getProvider(opts['provider'], notifier)
+        provider = getObject('provider', opts['provider'], notifier)
     except Exception as inst:
         notifier.writeError(str(inst), DEBUG)
         notifier.writeError('Could not create %s provider.' \
@@ -128,8 +128,8 @@ def main():
     for p in active_parsers.keys():
         parser = None
         try:
-            parser = parsers.base.getParser(active_parsers[p], provider, \
-                notifier)
+            parser = getObject('parser', active_parsers[p], notifier, \
+                provider=provider)
         except Exception as inst:
             notifier.writeError(str(inst), DEBUG)
             notifier.writeError('Could not create %s parser.' \
@@ -146,8 +146,8 @@ def main():
     # Export the contacts.
     exporter = None
     try:
-        exporter = exporters.base.getExporter(opts['exporter'], \
-            opts['output'], notifier)
+        exporter = getObject('exporter', opts['exporter'], notifier, \
+            destination=opts['output'])
     except Exception as inst:
         notifier.writeError(str(inst), DEBUG)
         notifier.writeError('Could not create %s exporter.' \

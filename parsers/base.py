@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-import parsers
-
 class Parser(object):
     """
     A generic template for a parser.
@@ -16,14 +14,3 @@ class Parser(object):
         This function should be overridden to return a list of contacts.
         """
         return []
-
-def getParser(module_name, provider, notifier):
-    """
-    Returns a new instance of the given parser.
-    """
-    mod = __import__('parsers.%s' % module_name, fromlist=['Parser'])
-    p = mod.Parser(provider, notifier)
-    if not isinstance(p, parsers.base.Parser):
-        raise Exception('Parser defined by module %s is not a valid parser' % \
-            module_name)
-    return p
