@@ -32,7 +32,7 @@ class Exporter(exporters.base.Exporter):
             fields = []
             for col in self.columns:
                 if col in person:
-                    fields.append(person[col])
+                    fields.append('"%s"' % person[col].replace('"', '""'))
                 else:
                     fields.append('')
             self.notifier.write('Writing record %s...' % ','.join(fields), \

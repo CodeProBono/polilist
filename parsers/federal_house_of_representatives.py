@@ -54,7 +54,7 @@ class Parser(parsers.base.Parser):
             # Electorate
             elem = moresoup.findAll('p', text=r_electorate)
             if elem:
-                person['electorate'] = '"%s"' % \
+                person['electorate'] = \
                     elem[0].strip()[len('Electoral Division of '):]
 
             # Name
@@ -63,14 +63,14 @@ class Parser(parsers.base.Parser):
                 fullname = elem[0].string
                 for p in VALID_PREFIX:
                     if fullname.startswith(p):
-                        person['prefix'] = '"%s"' % p
+                        person['prefix'] = p
                         fullname = fullname[len(p):]
                         break
                 parts = fullname.split()
                 if len(parts) >= 2:
-                    person['firstname'] = '"%s"' % parts[0]
-                    person['surname'] = '"%s"' % parts[1]
-                    person['suffix'] = '"%s"' % ' '.join(parts[2:])
+                    person['firstname'] = parts[0]
+                    person['surname'] = parts[1]
+                    person['suffix'] = ' '.join(parts[2:])
                 else:
                     self.notifier.writeError(\
                         'No name found for individual on %s' % page['href'], \
@@ -80,7 +80,7 @@ class Parser(parsers.base.Parser):
             if elem:
                 try:
                     elem = elem[0].next
-                    person['title'] = '"%s"' % elem.string.strip()[1:-1].strip()
+                    person['title'] = elem.string.strip()[1:-1].strip()
                 except Exception as inst:
                     self.notifier.writeError(\
                         '%s while determining title on page %s' % (str(inst), \
@@ -91,7 +91,7 @@ class Parser(parsers.base.Parser):
             if elem:
                 try:
                     elem = elem[0].next
-                    person['party'] = '"%s"' % elem.string.strip()[1:].strip()
+                    person['party'] = elem.string.strip()[1:].strip()
                 except Exception as inst:
                     self.notifier.writeError(\
                         '%s while determining party on page %s' % (str(inst), \
@@ -101,13 +101,13 @@ class Parser(parsers.base.Parser):
             elem = moresoup.findAll('p', text=r_address_parliament)
             if elem:
                 try:
-                    person['address'] = '"%s\n%s\n%s"' % \
+                    person['address'] = '%s\n%s\n%s' % \
                         (elem[0].next.string.strip(), \
                         elem[0].next.next.next.string.strip(), \
                         elem[0].next.next.next.next.next.string.strip())
                     elem = elem[0].next.next.next.next.next.next.next.next
                     person['suburb'], person['state'], person['postcode'] = \
-                        map(lambda x:'"%s"' % x, elem.string.split()[:3])
+                        elem.string.split()[:3]
                 except Exception as inst:
                     self.notifier.writeError(\
                         '%s while determining address on page %s' % \
@@ -118,7 +118,7 @@ class Parser(parsers.base.Parser):
             counter = 0
             for s in elem:
                 try:
-                    person['telephone%s' % (counter or '')] = '"%s"' % \
+                    person['telephone%s' % (counter or '')] = \
                         re.sub('[^0-9]', '', s.string.strip()[len('Tel:'):])
                     counter = counter + 1
                 except Exception as inst:
@@ -130,7 +130,7 @@ class Parser(parsers.base.Parser):
             elem = moresoup.findAll('p', text=r_telephone_tollfree)
             for s in elem:
                 try:
-                    person['telephone%s' % (counter or '')] = '"%s"' % \
+                    person['telephone%s' % (counter or '')] = \
                         re.sub('[^0-9]', '', \
                         s.string.strip()[len('Toll Free:'):])
                     counter = counter + 1
@@ -144,7 +144,7 @@ class Parser(parsers.base.Parser):
             counter = 0
             for s in elem:
                 try:
-                    person['fax%s' % (counter or '')] = '"%s"' % \
+                    person['fax%s' % (counter or '')] = \
                         re.sub('[^0-9]', '', s.string.strip()[len('Fax:'):])
                     counter = counter + 1
                 except Exception as inst:
@@ -158,13 +158,12 @@ class Parser(parsers.base.Parser):
             for s in elem:
                 try:
                     s = s.next.next
-                    person['address%s' % counter] = '"%s"' % s.string.strip()
+                    person['address%s' % counter] = s.string.strip()
                     s = s.next.next
-                    person['suburb%s' % counter] = '"%s"' % \
+                    person['suburb%s' % counter] = \
                         ' '.join(s.string.split()[:-2])
                     person['state%s' % counter], person['postcode%s' % \
-                        counter] = map(lambda x:'"%s"' % x, \
-                        s.string.split()[-2:])
+                        counter] = s.string.split()[-2:]
                     counter = counter + 1
                 except Exception as inst:
                     self.notifier.writeError(\
@@ -176,7 +175,7 @@ class Parser(parsers.base.Parser):
                                       ('firstspeech', 'First speech'), \
                                       ('homepage', 'Personal Home Page')]:
                 try:
-                    person['url_%s' % attribute] = '"%s"' % urlparse.urljoin( \
+                    person['url_%s' % attribute] = urlparse.urljoin( \
                         url, moresoup.findAll('a', text=text)[0].parent['href'])
                 except Exception as inst:
                     self.notifier.writeError(\
@@ -184,8 +183,8 @@ class Parser(parsers.base.Parser):
                         (str(inst), attribute, page['href']), DEBUG)
 
             # General details
-            person['level'] = '"federal"'
-            person['house'] = '"house of representatives"'
+            person['level'] = 'federal'
+            person['house'] = 'house of representatives'
 
             people.append(person)
         return people
