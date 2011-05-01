@@ -32,15 +32,18 @@ class Provider(providers.base.Provider):
         self.notifier = notifier
 
     def get(self, url):
+        # Determine where this page would have been cached.
         cached_copy = os.path.join(CACHE_DIR, hashlib.sha1(url).hexdigest())
         content = None
         if os.path.exists(cached_copy):
+            # The page is already in the cache.
             self.notifier.write('Retrieving %s (cached at %s)...' \
                 % (url, cached_copy), DETAILED)
             f = open(cached_copy, 'r')
             content = f.read()
             f.close()
         else:
+            # The page needs to be loaded into the cache.
             super(Provider, self).bePolite()
             self.notifier.write('Retrieving %s (uncached)...' % url, DETAILED)
             _, content = self.conn.request(url, 'GET')

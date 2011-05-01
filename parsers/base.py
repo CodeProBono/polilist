@@ -2,7 +2,8 @@
 
 class Parser(object):
     """
-    A generic template for a parser.
+    A generic template for a parser. All parsers should inherit from this class,
+    be named Parser and implement the functions below.
     """
 
     def __init__(self, provider, notifier):
@@ -11,6 +12,7 @@ class Parser(object):
 
     def get(url):
         """
-        This function should be overridden to return a list of contacts.
+        A parser should override this function such that it parses the page at
+        the given URL and returns a list of the contacts found on it.
         """
         return []

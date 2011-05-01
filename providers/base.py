@@ -9,7 +9,7 @@ class Provider(object):
     A base template for providers to implement. You may consider all the
     functions in this class abstract (i.e. must be overridden in children). Any
     class implementing this interface must be named 'Provider' and must reside
-    in the same directory as this file for it to be visible to the getProvider
+    in the same directory as this file for it to be visible to the getObject
     function.
     """
 
@@ -30,10 +30,9 @@ class Provider(object):
         """
         A utility function for waiting in between requests. This allows you to
         be kind to website admins by not hitting their servers so hard. Note
-        that classes planning to use this function need to initialise the
-        member last_request.
+        that classes planning to use this function need to set self.last_request
+        appropriately.
         """
         elapsed = time.time() - self.last_request
         if elapsed < POLITE_WAIT:
             time.sleep(POLITE_WAIT - elapsed)
-        self.last_request = time.time()

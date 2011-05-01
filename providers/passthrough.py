@@ -14,7 +14,7 @@ except ImportError:
 
 class Provider(providers.base.Provider):
     """
-    This class is defines a basic HTTP provider with no cacheing or other
+    This class defines a basic HTTP provider with no cacheing or other
     optimisations built in. You should only use this provider when debugging
     HTTP-related issues. If you use this provider regularly you will probably
     piss off website admins by sending an unexpected number of HTTP requests.

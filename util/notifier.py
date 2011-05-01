@@ -10,6 +10,12 @@ import exporters.base
 NOTHING, INFORMATION, DETAILED, DEBUG = range(4)
 
 class Notifier(object):
+    """
+    A class for printing notifications to the user. This encapsulation allows
+    you to easily redirect notifications to a file and to adjust the level of
+    verbosity of messages printed.
+    """
+
     def __init__(self, stdout, stderr, level=INFORMATION):
         self.stdout = stdout
         self.stderr = stderr
@@ -36,6 +42,8 @@ def getObject(category, module_name, notifier, **kwargs):
     a particular end user's system. E.g. You can write a SQLite exporter which
     will not cause problems for users who do not have SQLite installed unless
     they explicitly try to use it.
+
+    FIXME: This function doesn't really belong here.
     """
     mod = __import__('%ss.%s' % (category, module_name), fromlist=[ \
         category.capitalize()])

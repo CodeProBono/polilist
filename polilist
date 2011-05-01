@@ -7,6 +7,7 @@ import providers.base
 DEFAULT_PROVIDER = 'softcache'
 
 import parsers.base
+# A dictionary of parsers in use, in the form url:parser.
 active_parsers = {'http://www.aph.gov.au/house/members/mi-alpha.asp':'federal_house_of_representatives'}
 
 import exporters.base
@@ -14,6 +15,7 @@ DEFAULT_EXPORTER = 'csv'
 
 from util.notifier import *
 
+# Description of how to use this tool.
 USAGE_MESSAGE = """Usage: %(progname)s [options] -o output
        %(progname)s [options] --output=output
        %(progname)s [options] --clear-cache
@@ -25,12 +27,6 @@ USAGE_MESSAGE = """Usage: %(progname)s [options] -o output
   [ -p provider | --provider=provider ] Use the specific HTTP provider (default = passthrough).
   [ -v level | --verbosity=level ]      Set the level of verbosity of notifications. 0 = nothing, 1 = default, 2 = detailed, 3 = debug.
 """ % {'progname':sys.argv[0]}
-
-def debugPrint(message):
-    """
-    Print a debugging message.
-    """
-    sys.stderr.write('DEBUG: %s\n' % message)
 
 def parseArguments(options):
     """
@@ -71,12 +67,13 @@ def parseArguments(options):
 def main():
     # Setup default options.
     opts = { \
-        'clear-cache' :False, \
-        'exporter'    :DEFAULT_EXPORTER, \
-        'log'         :None, \
-        'output'      :None, \
-        'provider'    :DEFAULT_PROVIDER, \
-        'verbosity'   :INFORMATION \
+        'clear-cache' :False,            # Clear the provider cache and exit. \
+        'exporter'    :DEFAULT_EXPORTER, # Output formatter to use. \
+        'log'         :None,             # File to log to (None=std{out|err}). \
+        'output'      :None,             # File to export to. \
+        'provider'    :DEFAULT_PROVIDER, # HTTP proxy. \
+        'verbosity'   :INFORMATION       # Level of notifications printed. \
+                                         # (enum in util.notifier) \
     }
 
     # Parse command line arguments.

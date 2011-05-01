@@ -1,38 +1,62 @@
 This project is an effort to parse the contents of Australian government
 websites into a database suitable for mail merging, filtering, etc.
 
+Information for users
+---------------------
+To use this tool, you will need to the following components installed:
+ * python 2.6
+ * python-httplib2
+ * python-beautifulsoup (for some parsers)
+While this tool is designed to work on any operating system, it has only been
+tested on Linux. If you run into compatibility problems, please file a bug
+report as described below.
+
+To check the command line arguments for this tool run:
+ ./polilist --help
+
+More comprehensive information will be added to this README file as the tool
+matures. If you come across a bug or would like a feature added please request
+this at https://github.com/Smattr/polilist/issues.
+
+Information for developers
+--------------------------
 For now, while this project is in its early stages this README file will
 contain a basic overview of the proposed design of this system.
 
-If you're committing to this repository please follow these guidelines:
+Please follow these guidelines during development:
+ - Unless you have a very good reason, always use the hardcache provider during
+   development. If not, you will quickly upset website admins.
  - Don't commit uncommented code. I don't want to have to have to divine the
    meaning of your code.
  - If you are making a major architectural change, please speak to me about it
    before committing.
  - If you can see problems in the design that will cause issues down the road,
    please flag them with me as soon as possible.
+ - If you come across an issue that you can't (or don't want to) fix, please
+   raise it at https://github.com/Smattr/polilist/issues.
 Along with these, follow general DVCS-project politeness (informative commit
 messages, <80 characters in first line of commit message, don't create remote
-heads, don't commit code that doesn't compile, etc.).
+heads, don't commit code that doesn't compile, etc.). If you're about to do
+something that you think might upset people, ask them before pushing.
 
 Design
 ------
 Apologies for the confusing manner in which this is described. It's not very
 clear in my head right now.
                                                   +-----------+
-                                              +++-|Base Parser|
-                           +----+             ||| +-----------+
-    +-------------+<-------|Main|------+     +---------+
-    |Base Provider|        +----+      +---->|Base List|--...
-    +-------------+             |      |     +---------+
-        /       \               |      |      ||
-       /         \              |      |     +----------+
-      /           \             |      +---->|Base Entry|--...
-  +----------+   +----------+   |      |     +----------+
-  |Provider 1|   |Provider 2|   |      |      |
-  +----------+   +----------+   |      |     +------------+
-                                |      +---->|Base Entries|--...
-                               \ /           +------------+
+                                               ++-|Base Parser|
+                           +----+              || +-----------+
+    +-------------+<-------|Main|------+     +--------+
+    |Base Provider|        +----+      +---->|Parser 1|
+    +-------------+             |      |     +--------+
+        /       \               |      |       |
+       /         \              |      |     +--------+
+      /           \             |      +---->|Parser 2|
+  +----------+   +----------+   |            +--------+
+  |Provider 1|   |Provider 2|   |
+  +----------+   +----------+   |
+                                |
+                               \ /
                            +-----------+
                            |Base Output|
                            +-----------+
@@ -51,17 +75,11 @@ protocol for use in testing so as not to overload websites with unnecessary
 HTTP requests.
 
 Main has a set of parsers, each specific to a given webpage. Each parser
-encapsulates the format of a page by providing functions to retrieve the
-contents in a standard format. These contact details webpages are typically
-either a list of links to contact entry pages (in which case they are
-implemented with a class that inherits from Base List), a specific individual's
-contact information (in which case they inherit from Base Entry), or a list of
-several contacts' information (in which case they inherit from Base Entries).
-Lists define a function that returns a set of Base Entrys (sic) that can then
-be used to retrieve individuals' details. In this way, Main should just be able
-to iterate through its known parsers and recursively poll each one.
+encapsulates the format of a page by providing a function to retrieve the
+contacts on that page (or pages linked from there). In this way, Main should
+just be able to iterate through its known parsers and call each one.
 
-Main has a single Base Output that it uses when it comes time to write out the
+Main has a single Output that it uses when it comes time to write out the
 contact information it has discovered. Each Output defines a format for the
 file(s) it writes.
 
