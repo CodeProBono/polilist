@@ -32,11 +32,13 @@ USAGE_MESSAGE = """Usage: %(progname)s [options] -o output
   [ -d | --debug ]                      Turn on debugging output (equivalent to verbosity level 3).
   [ -e exporter | --exporter=exporter ] Use the specified exporter format (default CSV).
   [ -? | --help ]                       Display this information and exit.
+  [ -i source | --include=source ]      Include a particular source (note, this will exclude any other sources that are not explicitly included).
   [ -l logfile | --logfile=logfile ]    Direct information messages to the file logfile.
   [ --list-sources ]                    List the available sources (for use with the include/exclude source options).
   [ -o output | --output=output ]       Write results to output descriptor output. Note that whether output is a file, directory or other descriptor depends on which exporter you are using.
   [ -p provider | --provider=provider ] Use the specific HTTP provider (default = passthrough).
   [ -v level | --verbosity=level ]      Set the level of verbosity of notifications. 0 = nothing, 1 = default, 2 = detailed, 3 = debug.
+  [ -x source | --exclude=source ]      Exclude a particular source.
 """ % {'progname':sys.argv[0]}
 
 def parseArguments(options):
@@ -44,9 +46,10 @@ def parseArguments(options):
     Parse command line arguments and write the result to the dictionary passed
     in.
     """
-    optlist, args = getopt.getopt(sys.argv[1:], 'de:?l:o:p:v:', \
-        ['clear-cache', 'debug', 'exporter=', 'help', 'list-sources', \
-        'logfile=', 'output=', 'provider=', 'verbosity='])
+    optlist, args = getopt.getopt(sys.argv[1:], 'de:?i:l:o:p:v:x:', \
+        ['clear-cache', 'debug', 'exporter=', 'help', 'include=', \
+        'list-sources', 'logfile=', 'output=', 'provider=', 'verbosity=', \
+        'exclude='])
 
     if args:
         return False
@@ -61,6 +64,8 @@ def parseArguments(options):
         elif opt[0] in ['-?', '--help']:
             sys.stdout.write(USAGE_MESSAGE)
             sys.exit(0)
+        elif opt[0] in ['-i', '--include']:
+            options['include'].append(opt[1])
         elif opt[0] == '--list-sources':
             options['list-sources'] = True
         elif opt[0] in ['-l', '--logfile']:
@@ -74,6 +79,8 @@ def parseArguments(options):
                 options['verbosity'] = int(opt[1])
             except ValueError:
                 return False
+        elif opt[0] in ['-x', '--exclude']:
+            options['exclude'].append(opt[1])
 
     return True
 
@@ -82,12 +89,14 @@ def main():
     opts = { \
         'clear-cache' :False,            # Clear the provider cache and exit. \
         'exporter'    :DEFAULT_EXPORTER, # Output formatter to use. \
+        'include'     :[],               # Sources to include ([] == all). \
         'list-sources':False,            # List available sources and exit. \
         'log'         :None,             # File to log to (None=std{out|err}). \
         'output'      :None,             # File to export to. \
         'provider'    :DEFAULT_PROVIDER, # HTTP proxy. \
-        'verbosity'   :INFORMATION       # Level of notifications printed. \
+        'verbosity'   :INFORMATION,      # Level of notifications printed. \
                                          # (enum in util.notifier) \
+        'exclude'     :[]                # Sources to exclude ([] == none). \
     }
 
     # Parse command line arguments.
@@ -101,6 +110,13 @@ def main():
         sys.stdout.write('Available sources:\n %s\n' % \
             '\n '.join(available_sources.keys()))
         sys.exit(0)
+
+    # Filter the sources if requested.
+    sources = available_sources.keys()
+    if opts['include']:
+        sources = filter(lambda x: x in opts['include'], sources)
+    if opts['exclude']:
+        sources = filter(lambda x: x not in opts['exclude'], sources)
 
     # Construct the notifier.
     notifier = None
@@ -142,7 +158,7 @@ def main():
 
     # Enumerate the parsers and retrieve contacts' details.
     contacts = []
-    for p in available_sources.keys():
+    for p in sources:
         parser = None
         try:
             parser = getObject('parser', available_sources[p]['parser'], \
