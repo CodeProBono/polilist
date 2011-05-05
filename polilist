@@ -7,8 +7,16 @@ import providers.base
 DEFAULT_PROVIDER = 'softcache'
 
 import parsers.base
-# A dictionary of parsers in use, in the form url:parser.
-active_parsers = {'http://www.aph.gov.au/house/members/mi-alpha.asp':'federal_house_of_representatives'}
+# A dictionary of available sources. Each source is given as a dictionary entry
+# with the value being a dictionary itself with the members 'url' (the address
+# of the root page containing the contact details for this branch of
+# parliament) and 'parser' (containing the name of the parser to use to
+# interpret the given url). Note the keys of the (outer) dictionary correspond
+# to the parameters that can be passed on the command line to include and
+# exclude given sources.
+available_sources = {'federal house of representatives':\
+                         {'url':'http://www.aph.gov.au/house/members/mi-alpha.asp', \
+                          'parser':'federal_house_of_representatives'}}
 
 import exporters.base
 DEFAULT_EXPORTER = 'csv'
@@ -19,11 +27,13 @@ from util.notifier import *
 USAGE_MESSAGE = """Usage: %(progname)s [options] -o output
        %(progname)s [options] --output=output
        %(progname)s [options] --clear-cache
+       %(progname)s [options] --list-sources
   [ --clear-cache ]                     Clear the selected provider's cache. You should explicitly specify a provider when using this option or you may find that you don't delete the cache you're intending to. You should never need to use this option unless you are developing/debugging.
   [ -d | --debug ]                      Turn on debugging output (equivalent to verbosity level 3).
   [ -e exporter | --exporter=exporter ] Use the specified exporter format (default CSV).
   [ -? | --help ]                       Display this information and exit.
   [ -l logfile | --logfile=logfile ]    Direct information messages to the file logfile.
+  [ --list-sources ]                    List the available sources (for use with the include/exclude source options).
   [ -o output | --output=output ]       Write results to output descriptor output. Note that whether output is a file, directory or other descriptor depends on which exporter you are using.
   [ -p provider | --provider=provider ] Use the specific HTTP provider (default = passthrough).
   [ -v level | --verbosity=level ]      Set the level of verbosity of notifications. 0 = nothing, 1 = default, 2 = detailed, 3 = debug.
@@ -35,8 +45,8 @@ def parseArguments(options):
     in.
     """
     optlist, args = getopt.getopt(sys.argv[1:], 'de:?l:o:p:v:', \
-        ['clear-cache', 'debug', 'exporter=', 'help', 'logfile=', 'output=', \
-        'provider=', 'verbosity='])
+        ['clear-cache', 'debug', 'exporter=', 'help', 'list-sources', \
+        'logfile=', 'output=', 'provider=', 'verbosity='])
 
     if args:
         return False
@@ -51,6 +61,8 @@ def parseArguments(options):
         elif opt[0] in ['-?', '--help']:
             sys.stdout.write(USAGE_MESSAGE)
             sys.exit(0)
+        elif opt[0] == '--list-sources':
+            options['list-sources'] = True
         elif opt[0] in ['-l', '--logfile']:
             options['log'] = opt[1]
         elif opt[0] in ['-o', '--output']:
@@ -70,6 +82,7 @@ def main():
     opts = { \
         'clear-cache' :False,            # Clear the provider cache and exit. \
         'exporter'    :DEFAULT_EXPORTER, # Output formatter to use. \
+        'list-sources':False,            # List available sources and exit. \
         'log'         :None,             # File to log to (None=std{out|err}). \
         'output'      :None,             # File to export to. \
         'provider'    :DEFAULT_PROVIDER, # HTTP proxy. \
@@ -79,9 +92,15 @@ def main():
 
     # Parse command line arguments.
     if not parseArguments(opts) or (not opts['output'] and \
-        not opts['clear-cache']):
+        not opts['clear-cache'] and not opts['list-sources']):
         sys.stderr.write(USAGE_MESSAGE)
         sys.exit(1)
+
+    # List sources if requested.
+    if opts['list-sources']:
+        sys.stdout.write('Available sources:\n %s\n' % \
+            '\n '.join(available_sources.keys()))
+        sys.exit(0)
 
     # Construct the notifier.
     notifier = None
@@ -123,23 +142,24 @@ def main():
 
     # Enumerate the parsers and retrieve contacts' details.
     contacts = []
-    for p in active_parsers.keys():
+    for p in available_sources.keys():
         parser = None
         try:
-            parser = getObject('parser', active_parsers[p], notifier, \
-                provider=provider)
+            parser = getObject('parser', available_sources[p]['parser'], \
+                notifier, provider=provider)
         except Exception as inst:
             notifier.writeError(str(inst), DEBUG)
             notifier.writeError('Could not create %s parser.' \
-                % active_parsers[p], INFORMATION)
+                % available_sources[p]['parser'], INFORMATION)
             continue
 
         try:
-            contacts.extend(parser.get(p))
+            contacts.extend(parser.get(available_sources[p]['url']))
         except Exception as inst:
             notifier.writeError(str(inst), DEBUG)
             notifier.writeError('Could not parse %s using parser %s.' \
-                % (p, active_parsers[p]), INFORMATION)
+                % (available_sources[p]['url'], \
+                available_sources[p]['parser']), INFORMATION)
 
     # Export the contacts.
     exporter = None
