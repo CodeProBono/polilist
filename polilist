@@ -23,6 +23,7 @@ USAGE_MESSAGE = """Usage: %(progname)s [options] -o output
   [ -d | --debug ]                      Turn on debugging output (equivalent to verbosity level 3).
   [ -e exporter | --exporter=exporter ] Use the specified exporter format (default CSV).
   [ -? | --help ]                       Display this information and exit.
+  [ -l logfile | --logfile=logfile ]    Direct information messages to the file logfile.
   [ -o output | --output=output ]       Write results to output descriptor output. Note that whether output is a file, directory or other descriptor depends on which exporter you are using.
   [ -p provider | --provider=provider ] Use the specific HTTP provider (default = passthrough).
   [ -v level | --verbosity=level ]      Set the level of verbosity of notifications. 0 = nothing, 1 = default, 2 = detailed, 3 = debug.
