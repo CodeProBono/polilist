@@ -43,7 +43,7 @@ class Parser(parsers.base.Parser):
         r_telephone_tollfree = re.compile('.*Toll Free:.*')
         r_address_parliament = re.compile('.*Parliament House Contact.*')
         r_address_office = re.compile('.*(Location)|(Postal Address).*')
-        r_email = re.compile('mailto:.*')
+        r_email = re.compile('mailto:(?!web\.reps@aph\.gov\.au)')
 
         for page in soup.findAll('a', href=re.compile(CONTACT_LINK)):
             self.notifier.write('Parsing %s (referenced by %s)...' \
@@ -174,8 +174,7 @@ class Parser(parsers.base.Parser):
             # Email
             elem = moresoup.findAll('a', href=r_email)
             try:
-                if elem and elem[0]['href'][len('mailto:'):] != \
-                    'web.reps@aph.gov.au': # Filter out admin address
+                if elem:
                     person['email'] = elem[0]['href'][len('mailto:'):]
             except Exception as inst:
                 self.notifier.writeError(\
