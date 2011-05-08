@@ -20,7 +20,7 @@ class Parser(parsers.base.Parser):
         Retrieves the councillors index page of Woollahra Council and parses
         the linked pages for each ward to get the councillors' details.
         """
-        self.notifier.write('Parsing %s...\n' % url, DEBUG)
+        self.notifier.write('Parsing %s...' % url, DEBUG)
         soup = BeautifulSoup.BeautifulSoup(self.provider.get(url))
 
         pages_processed = []

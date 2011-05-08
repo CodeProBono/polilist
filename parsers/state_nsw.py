@@ -17,7 +17,7 @@ class Parser(parsers.base.Parser):
         Retrieves the contacts spreadsheet at the given url and parses it into
         a dictionary.
         """
-        self.notifier.write('Parsing %s...\n' % url, DEBUG)
+        self.notifier.write('Parsing %s...' % url, DEBUG)
         spreadsheet = self.provider.get(url)
 
         # Chop the string into CSV fields and headers.
