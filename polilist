@@ -16,7 +16,10 @@ import parsers.base
 # exclude given sources.
 available_sources = {'federal house of representatives':\
                          {'url':'http://www.aph.gov.au/house/members/mi-alpha.asp', \
-                          'parser':'federal_house_of_representatives'}}
+                          'parser':'federal_house_of_representatives'}, \
+                     'local woollahra':\
+                         {'url':'http://www.woollahra.nsw.gov.au/council/mayor_and_councillors/profiles', \
+                          'parser':'local_woollahra'}}
 
 import exporters.base
 DEFAULT_EXPORTER = 'csv'
