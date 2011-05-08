@@ -19,7 +19,10 @@ available_sources = {'federal house of representatives':\
                           'parser':'federal_house_of_representatives'}, \
                      'local woollahra':\
                          {'url':'http://www.woollahra.nsw.gov.au/council/mayor_and_councillors/profiles', \
-                          'parser':'local_woollahra'}}
+                          'parser':'local_woollahra'}, \
+                     'state nsw':\
+                         {'url':'http://www.parliament.nsw.gov.au/prod/parlment/members.nsf/reports/ContactSpreadsheetAll.csv', \
+                          'parser':'state_nsw'}}
 
 import exporters.base
 DEFAULT_EXPORTER = 'csv'
