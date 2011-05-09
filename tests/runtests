@@ -5,6 +5,9 @@
 
 # TODO: A Windows version of this script.
 
+# Ensure current directory is the directory this script lives in.
+pushd $(dirname $0) >/dev/null
+
 find . -nowarn \
        -mindepth 2 -and \
        -maxdepth 2 -and \
@@ -17,7 +20,9 @@ find . -nowarn \
 
 if [ -e failure-indicator ]; then
     rm failure-indicator
+    popd >/dev/null
     exit 1
 else
+    popd >/dev/null
     exit 0
 fi
