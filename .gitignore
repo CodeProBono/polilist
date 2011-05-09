@@ -3,3 +3,6 @@
 
 # HTTP caches
 .cache*
+
+# vim working files
+*.swp
