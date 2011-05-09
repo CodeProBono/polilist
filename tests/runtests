@@ -15,7 +15,8 @@ find . -nowarn \
        ! -path './.*' -and \
        -type f -and \
        -executable -and \
-       ! -exec {} \; \
+       ! -exec {} \; -and \
+       -exec echo "FAILED: {}" 1>&2 \; -and \
        -exec touch failure-indicator  \;
 
 if [ -e failure-indicator ]; then
