@@ -14,6 +14,10 @@ def main():
     # Imports stem from the project root.
     sys.path.append(os.path.abspath('..'))
 
+    # Avoid polluting the working directory (and unnecessary network traffic)
+    # and force the provider to use its existing cache.
+    os.chdir('..')
+
     # Get a null handle for masking notifier output.
     nullh = open(os.devnull, 'w')
 
