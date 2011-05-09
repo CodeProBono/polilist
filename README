@@ -1,4 +1,4 @@
-This project is an effort to parse the contents of Australian government
+This project is an effort to parse the contents of Australian parliament
 websites into a database suitable for mail merging, filtering, etc.
 
 Information for users
@@ -84,3 +84,7 @@ contact information it has discovered. Each Output defines a format for the
 file(s) it writes.
 
 That should all be as clear as mud now.
+
+Links
+-----
+Directory of NSW local councils: http://www.dlg.nsw.gov.au/dlg/dlghome/dlg_localgovdirectory.asp
