@@ -14,15 +14,20 @@ import parsers.base
 # interpret the given url). Note the keys of the (outer) dictionary correspond
 # to the parameters that can be passed on the command line to include and
 # exclude given sources.
-available_sources = {'federal house of representatives':\
-                         {'url':'http://www.aph.gov.au/house/members/mi-alpha.asp', \
-                          'parser':'federal_house_of_representatives'}, \
-                     'local woollahra':\
-                         {'url':'http://www.woollahra.nsw.gov.au/council/mayor_and_councillors/profiles', \
-                          'parser':'local_woollahra'}, \
-                     'state nsw':\
-                         {'url':'http://www.parliament.nsw.gov.au/prod/parlment/members.nsf/reports/ContactSpreadsheetAll.csv', \
-                          'parser':'state_nsw'}}
+available_sources = { \
+    'federal house of representatives':{ \
+        'url':'http://www.aph.gov.au/house/members/mi-alpha.asp', \
+        'parser':'federal_house_of_representatives'}, \
+    'state nsw':{ \
+        'url':'http://www.parliament.nsw.gov.au/prod/parlment/members.nsf/reports/ContactSpreadsheetAll.csv', \
+        'parser':'state_nsw'}, \
+    'local woollahra':{ \
+        'url':'http://www.woollahra.nsw.gov.au/council/mayor_and_councillors/profiles', \
+        'parser':'local_woollahra'}, \
+    'local young shire':{ \
+        'url':'http://www.young.nsw.gov.au/councillors_pict.htm', \
+        'parser':'local_young_shire'} \
+                    }
 
 import exporters.base
 DEFAULT_EXPORTER = 'csv'
