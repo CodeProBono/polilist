@@ -120,7 +120,7 @@ class Parser(parsers.base.Parser):
             for s in elem:
                 try:
                     person['telephone%s' % (counter or '')] = \
-                        re.sub('[^0-9]', '', s.string.strip()[len('Tel:'):])
+                        re.sub(r'[^0-9]', '', s.string.strip()[len('Tel:'):])
                     counter = counter + 1
                 except Exception as inst:
                     self.notifier.writeError(\
@@ -132,7 +132,7 @@ class Parser(parsers.base.Parser):
             for s in elem:
                 try:
                     person['telephone%s' % (counter or '')] = \
-                        re.sub('[^0-9]', '', \
+                        re.sub(r'[^0-9]', '', \
                         s.string.strip()[len('Toll Free:'):])
                     counter = counter + 1
                 except Exception as inst:
@@ -146,7 +146,7 @@ class Parser(parsers.base.Parser):
             for s in elem:
                 try:
                     person['fax%s' % (counter or '')] = \
-                        re.sub('[^0-9]', '', s.string.strip()[len('Fax:'):])
+                        re.sub(r'[^0-9]', '', s.string.strip()[len('Fax:'):])
                     counter = counter + 1
                 except Exception as inst:
                     self.notifier.writeError(\
