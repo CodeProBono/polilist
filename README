@@ -34,6 +34,8 @@ Please follow these guidelines during development:
    please flag them with me as soon as possible.
  - If you come across an issue that you can't (or don't want to) fix, please
    raise it at https://github.com/Smattr/polilist/issues.
+ - If possible, make sure your changes don't break any of the tests (ensure
+   tests/runtests executes correctly).
 Along with these, follow general DVCS-project politeness (informative commit
 messages, <80 characters in first line of commit message, don't create remote
 heads, don't commit code that doesn't compile, etc.). If you're about to do
@@ -84,6 +86,27 @@ contact information it has discovered. Each Output defines a format for the
 file(s) it writes.
 
 That should all be as clear as mud now.
+
+Testing
+-------
+The directory tests contains all the unit and regression tests for this project.
+To run them, execute the script runtests in this directory. Note that running
+the tests may cause some data to be downloaded and you should expect some tests
+to fail if you do not have an available connection to the internet.
+
+If you look at runtests, you will see that it just executes every executable
+file in the subdirectories (currently unit and regression). To create a new test
+just create an executable file (can be any interpreted language) in one of the
+subdirectories. To decide where your new test should live, refer to the
+following list:
+ - tests/regression Tests that prove the absence of some previously observed
+                    bug. The purpose of these tests is to ensure a bug that has
+                    been fixed in the past is not reintroduced by new changes.
+                    When closing a bug you should also commit a regression test
+                    that validates the fix.
+ - tests/unit       Tests that probe a feature of a specific module in
+                    isolation. These do not have to run through the same setup
+                    as the main program logic.
 
 Links
 -----
