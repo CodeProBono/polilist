@@ -24,6 +24,9 @@ available_sources = { \
     'local woollahra':{ \
         'url':'http://www.woollahra.nsw.gov.au/council/mayor_and_councillors/profiles', \
         'parser':'local_woollahra'}, \
+    'local yass valley':{ \
+        'url':'http://www.yass.nsw.gov.au/council/1385.html', \
+        'parser':'local_yass'}, \
     'local young shire':{ \
         'url':'http://www.young.nsw.gov.au/councillors_pict.htm', \
         'parser':'local_young_shire'} \
