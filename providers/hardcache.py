@@ -1,11 +1,18 @@
 #!/usr/bin/env python
 
-import providers.base
 import sys
 import hashlib
 import os
 import time
 
+CACHE_DIR = os.path.abspath('.cache.hard')
+
+# Some juggling to make sure project modules get imported regardless of context.
+if __name__ == '__main__':
+    os.chdir(os.path.dirname(sys.argv[0]))
+    sys.path.append('..')
+
+import providers.base
 from util.notifier import *
 
 try:
@@ -13,8 +20,6 @@ try:
 except ImportError:
     sys.stderr.write('Failed to import httplib2 (python-httplib2). Is it installed?\n')
     sys.exit(1)
-
-CACHE_DIR = '.cache.hard'
 
 class Provider(providers.base.Provider):
     """
@@ -59,3 +64,24 @@ class Provider(providers.base.Provider):
             os.listdir(CACHE_DIR)):
             self.notifier.write('Deleting %s...' % page)
             os.remove(page)
+
+def main():
+    """
+    This function allows you to directly execute this provider to prime the
+    cache with pages you know you will need to retrieve later. This is useful if
+    you are doing development work without a connection to the internet. You can
+    prime the cache while you are online with all the pages you will need to
+    request while developing offline.
+    """
+    if len(sys.argv) < 2:
+        sys.stderr.write('Usage: %s URL\n' % sys.argv[0])
+        sys.exit(1)
+
+    # Assume that only developers will be calling this directly, and so want
+    # debug information.
+    n = Notifier(sys.stdout, sys.stderr, DEBUG)
+    p = Provider(n)
+    p.get(sys.argv[1])
+
+if __name__ == '__main__':
+    main()
