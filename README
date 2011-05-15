@@ -95,18 +95,20 @@ the tests may cause some data to be downloaded and you should expect some tests
 to fail if you do not have an available connection to the internet.
 
 If you look at runtests, you will see that it just executes every executable
-file in the subdirectories (currently unit and regression). To create a new test
-just create an executable file (can be any interpreted language) in one of the
-subdirectories. To decide where your new test should live, refer to the
-following list:
- - tests/regression Tests that prove the absence of some previously observed
-                    bug. The purpose of these tests is to ensure a bug that has
-                    been fixed in the past is not reintroduced by new changes.
-                    When closing a bug you should also commit a regression test
-                    that validates the fix.
- - tests/unit       Tests that probe a feature of a specific module in
-                    isolation. These do not have to run through the same setup
-                    as the main program logic.
+file in the subdirectories. To create a new test just create an executable file
+(can be any interpreted language) in one of the subdirectories. To decide where
+your new test should live, refer to the following list:
+ - tests/integration Tests that only interact with the project through its
+                     external interfaces. These are tests designed to exercise
+                     the project functionality that is exposed to end users.
+ - tests/regression  Tests that prove the absence of some previously observed
+                     bug. The purpose of these tests is to ensure a bug that has
+                     been fixed in the past is not reintroduced by new changes.
+                     When closing a bug you should also commit a regression test
+                     that validates the fix.
+ - tests/unit        Tests that probe a feature of a specific module in
+                     isolation. These do not have to run through the same setup
+                     as the main program logic.
 
 Links
 -----
