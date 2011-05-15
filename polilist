@@ -116,9 +116,13 @@ def main():
         'exclude'     :[]                # Sources to exclude ([] == none). \
     }
 
-    # Parse command line arguments.
-    if not parseArguments(opts) or (not opts['output'] and \
-        not opts['clear-cache'] and not opts['list-sources']):
+    # Parse command line arguments. Weird structure to catch the fact that
+    # parseArguments can throw an exception as well.
+    try:
+        if not parseArguments(opts) or (not opts['output'] and \
+            not opts['clear-cache'] and not opts['list-sources']):
+                raise Exception('Bad arguments')
+    except:
         sys.stderr.write(USAGE_MESSAGE)
         sys.exit(1)
 
