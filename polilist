@@ -18,6 +18,9 @@ available_sources = { \
     'federal house of representatives':{ \
         'url':'http://www.aph.gov.au/house/members/mi-alpha.asp', \
         'parser':'federal_house_of_representatives'}, \
+    'federal senate':{ \
+        'url':'http://www.aph.gov.au/Senate/senators/homepages/index.asp', \
+        'parser':'federal_senate'}, \
     'state nsw':{ \
         'url':'http://www.parliament.nsw.gov.au/prod/parlment/members.nsf/reports/ContactSpreadsheetAll.csv', \
         'parser':'state_nsw'}, \
