@@ -24,6 +24,9 @@ available_sources = { \
     'state nsw':{ \
         'url':'http://www.parliament.nsw.gov.au/prod/parlment/members.nsf/reports/ContactSpreadsheetAll.csv', \
         'parser':'state_nsw'}, \
+    'local wollondilly':{ \
+        'url':'http://www.wollondilly.nsw.gov.au/council/1181/1200.html', \
+        'parser':'local_wollondilly'}, \
     'local woollahra':{ \
         'url':'http://www.woollahra.nsw.gov.au/council/mayor_and_councillors/profiles', \
         'parser':'local_woollahra'}, \
