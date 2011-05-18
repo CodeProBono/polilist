@@ -27,13 +27,13 @@ available_sources = { \
     'local woollahra':{ \
         'url':'http://www.woollahra.nsw.gov.au/council/mayor_and_councillors/profiles', \
         'parser':'local_woollahra'}, \
-    'local wyong shire':{ \
+    'local wyong':{ \
         'url':'http://www.wyong.nsw.gov.au/about-council/your-councillors/', \
         'parser':'local_wyong_shire'}, \
     'local yass valley':{ \
         'url':'http://www.yass.nsw.gov.au/council/1385.html', \
         'parser':'local_yass'}, \
-    'local young shire':{ \
+    'local young':{ \
         'url':'http://www.young.nsw.gov.au/councillors_pict.htm', \
         'parser':'local_young_shire'} \
                     }
