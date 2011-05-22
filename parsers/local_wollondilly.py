@@ -20,6 +20,11 @@ class Parser(parsers.base.Parser):
         self.notifier.write('Parsing %s...' % url, DEBUG)
         soup = BeautifulSoup.BeautifulSoup(self.provider.get(url))
 
+        # REs
+        r_email = re.compile('^mailto:.*')
+        r_phone = re.compile('.*(Contact Details)|(To contact C)|(You can contact C)|(Phone:)|(Mobile:).*[0-9].*')
+        r_letters = re.compile('[A-Za-z]')
+
         pages_processed = []
         people = []
 
@@ -40,7 +45,9 @@ class Parser(parsers.base.Parser):
 
             # Name
             try:
-                parts = re.sub('&.*?;', '', re.sub(r'<.*?>', '', str(moresoup.findAll('h1')[0]).split('&#40;')[0]).replace('&#32;', ' ')).split()
+                parts = re.sub('&.*?;', '', re.sub(r'<.*?>', '', \
+                    str(moresoup.findAll('h1')[0]).split(\
+                    '&#40;')[0]).replace('&#32;', ' ')).split()
                 if parts[-1] == 'Mayor':
                     if parts[-2] == 'Deputy':
                         person['firstname'], person['surname'] = parts[-4:-2]
@@ -52,6 +59,37 @@ class Parser(parsers.base.Parser):
                 self.notifier.writeError(\
                     '%s while determining name number on page %s' % \
                     (str(inst), page), DEBUG)
+
+            try:
+                person['email'] = re.sub(r'<.*?>', '', str(\
+                    moresoup.findAll('a', href=r_email)[0]))
+            except Exception as inst:
+                self.notifier.writeError(\
+                    '%s while determining email number on page %s' % \
+                    (str(inst), page), DEBUG)
+
+            try:
+                for line in moresoup.findAll('p', text=r_phone):
+                    ph_nums = filter(None, map(lambda x: re.sub(r'[^0-9]', \
+                        '', x), r_letters.split(str(line))))
+                    for num in ph_nums:
+                        if len(num) == 10:
+                            if num.startswith('02'):
+                                person['phone'] = num
+                            else:
+                                person['mobile'] = num
+                        elif len(num) == 8:
+                            person['phone'] = '02%s' % num
+                        else:
+                            person['person'] = num
+            except Exception as inst:
+                self.notifier.writeError(\
+                    '%s while determining phone number on page %s' % \
+                    (str(inst), page), DEBUG)
+
+            person['level'] = 'local'
+            person['state'] = 'NSW'
+            person['electorate'] = 'Wollondilly'
 
             people.append(person)
 

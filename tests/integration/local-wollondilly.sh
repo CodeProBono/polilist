@@ -1,7 +1,7 @@
 #!/bin/sh
 
 PARSER="local wollondilly"
-COLUMN_LIST="firstname surname email phone fax"
+COLUMN_LIST="firstname surname email phone"
 MIN_RECORDS=9
 
 export PARSER COLUMN_LIST MIN_RECORDS
