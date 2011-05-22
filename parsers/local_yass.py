@@ -89,6 +89,10 @@ class Parser(parsers.base.Parser):
                     ' from %s on page %s (next %s)' % (str(inst), \
                     str(entry), url, str(entry.next)), DEBUG)
 
+            person['level'] = 'local'
+            person['state'] = 'NSW'
+            person['electorate'] = 'Yass'
+
             people.append(person)
 
         return people

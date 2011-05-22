@@ -109,6 +109,10 @@ class Parser(parsers.base.Parser):
                         if k in person.keys() and not person[k]:
                             del person[k]
 
+                person['level'] = 'local'
+                person['state'] = 'NSW'
+                person['electorate'] = 'Young Shire'
+
                 people.append(person)
             except Exception as inst:
                 self.notifier.writeError(\
