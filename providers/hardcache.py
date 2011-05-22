@@ -50,7 +50,7 @@ class Provider(providers.base.Provider):
         else:
             # The page needs to be loaded into the cache.
             super(Provider, self).bePolite()
-            self.notifier.write('Retrieving %s (uncached)...' % url, DETAILED)
+            self.notifier.write('Retrieving %s (uncached; saving to %s)...' % (url, cached_copy), DETAILED)
             _, content = self.conn.request(url, 'GET')
             f = open(cached_copy, 'w')
             f.write(content)
