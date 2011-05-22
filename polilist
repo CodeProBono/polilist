@@ -33,7 +33,7 @@ available_sources = { \
     'local wyong':{ \
         'url':'http://www.wyong.nsw.gov.au/about-council/your-councillors/', \
         'parser':'local_wyong_shire'}, \
-    'local yass valley':{ \
+    'local yass':{ \
         'url':'http://www.yass.nsw.gov.au/council/1385.html', \
         'parser':'local_yass'}, \
     'local young':{ \
