@@ -38,7 +38,7 @@ class Provider(providers.base.Provider):
 
     def get(self, url):
         # Determine where this page would have been cached.
-        cached_copy = os.path.join(CACHE_DIR, hashlib.sha1(url).hexdigest())
+        cached_copy = os.path.join(CACHE_DIR, hashlib.md5(url).hexdigest())
         content = None
         if os.path.exists(cached_copy):
             # The page is already in the cache.
