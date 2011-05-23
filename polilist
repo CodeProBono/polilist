@@ -24,6 +24,9 @@ available_sources = { \
     'state nsw':{ \
         'url':'http://www.parliament.nsw.gov.au/prod/parlment/members.nsf/reports/ContactSpreadsheetAll.csv', \
         'parser':'state_nsw'}, \
+    'local willoughby':{ \
+        'url':'http://www.willoughby.nsw.gov.au/About-Council/Mayor---Councillors/', \
+        'parser':'local_willoughby'}, \
     'local wollondilly':{ \
         'url':'http://www.wollondilly.nsw.gov.au/council/1181/1200.html', \
         'parser':'local_wollondilly'}, \
